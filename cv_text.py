@@ -4,6 +4,9 @@ import cv2
 
 VIDEO_PATH = 0
 WINDOW_NAME = "frame"
+SIZE = (640, 480)
+VIDEO_NAME = "timelapse.mp4"
+FRAME_RATE = 2
 
 def init_video():
     cap = cv2.VideoCapture(VIDEO_PATH)
@@ -12,32 +15,10 @@ def init_video():
         sys.exit()
     return cap
 
-
-
-def create_timelapse():
-    images = sorted("./timelapse/src/*.png") # 撮影した画像の読み込み。
-    if len(images) < 30: #FPS設定
-        frame_rate = 2  
-    else:
-        frame_rate = len(images)/30
-
-    width = 640
-    height = 480
-    fourcc = cv2.VideoWriter_fourcc('m','p','4','v') # 動画のコーデックをmp指定。（ちょっと違うが）動画の拡張子を決める、    
-    video = cv2.VideoWriter("timelapse.mp4", fourcc, frame_rate, (width, height)) # 作成する動画の情報を指定（ファイル名、拡張子、FPS、動画サイズ）。
-
-
-    for i in range(len(images)):
-        # 画像を読み込む
-        img = cv2.imread(images[i])
-        # 画像のサイズを合わせる。
-        video.write(img) 
-
-    video.release()
-
 def main():
-    i = 0
     cap = init_video()
+    fourcc = cv2.VideoWriter_fourcc('m','p','4','v')   
+    video = cv2.VideoWriter(VIDEO_NAME, fourcc, 30, SIZE)
     dt = datetime.datetime.now()
     pre_ut = int(dt.timestamp())
     while True:
@@ -47,14 +28,13 @@ def main():
         cv2.imshow(f"{WINDOW_NAME}", frame)
         
         if (abs(pre_ut - int(dt.timestamp())) > 2):
-            cv2.imwrite(f"./timelapse/src/{i}.png", frame)
+            video.write(frame) 
             dt = datetime.datetime.now()
             pre_ut = int(dt.timestamp())
-            i = i + 1
                 
-            
         if cv2.waitKey(1) == ord('q'):
-            create_timelapse()
+            cap.release()
+            video.release()
             break
     cv2.destroyAllWindows()
 
