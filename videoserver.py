@@ -2,7 +2,7 @@ import socketserver
 import cv2
 import pickle
 
-HOST = '192.168.101.36'
+HOST = ''
 PORT = 2000
 BUFFER_SIZE = 4096
 ADDER = (HOST, PORT)
